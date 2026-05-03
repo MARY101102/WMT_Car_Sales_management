@@ -1,0 +1,23 @@
+# Node backend
+node_modules/
+npm-debug.log*
+logs
+*.log
+.env
+.env.local
+.env.*.local
+dist/
+coverage/
+.DS_Store
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+
+# Database
+*.sqlite
+*.db
+
+# Misc
+*.log
