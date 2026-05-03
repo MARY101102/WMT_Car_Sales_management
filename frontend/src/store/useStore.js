@@ -9,10 +9,9 @@ const useStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        set({ token, isAuthenticated: true });
-        // Optionally fetch and set `user` here if your API supports it
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (accessToken) {
+        set({ token: accessToken, isAuthenticated: true });
       } else {
         set({ token: null, isAuthenticated: false, user: null });
       }

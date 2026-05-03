@@ -3,9 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Platform } from 'react-native';
 
-const API_URL = Platform.OS === 'web' 
-  ? 'http://localhost:5000/api/v1' 
-  : 'http://192.168.8.100:5000/api/v1';
+// Use your machine IP on the LAN so Expo Go (on a device) can reach the backend.
+// Metro showed exp://192.168.1.11:8081 — use that host for the API.
+const API_HOST = Platform.OS === 'web' ? 'localhost' : '192.168.1.11';
+const API_URL = `http://${API_HOST}:5000/api/v1`;
 
 const api = axios.create({
   baseURL: API_URL,
