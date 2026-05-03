@@ -1,0 +1,62 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
+logs/*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build
+dist/
+build/
+coverage/
+.tmp/
+
+# Backend
+/backend/node_modules/
+/backend/dist/
+
+# Frontend (React Native / Expo)
+/frontend/node_modules/
+/frontend/.expo/
+.expo/
+.expo-shared/
+android/
+ios/
+*.keystore
+
+# Misc
+coverage/
+*.sqlite3
+*.sqlite
+*.db
+
+# npm package lock (optional)
+# package-lock.json
