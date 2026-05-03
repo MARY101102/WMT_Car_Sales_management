@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Platform, Image } from 'react-native';
 import { Tag, Calendar, Percent, CheckCircle2, DollarSign, Save, Image as ImageIcon } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../services/api';
@@ -47,6 +47,13 @@ export default function EditPromotionScreen({ route, navigation }) {
     }
   };
 
+  const generateCode = (len = 8) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let out = '';
+    for (let i = 0; i < len; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+    setCode(out);
+  };
+
   const handleUpdate = async () => {
     if (!title || !code || !discountValue || !endDate) {
       showError('Please fill in all fields');
@@ -54,10 +61,14 @@ export default function EditPromotionScreen({ route, navigation }) {
     }
     if (discountType === 'Percentage') {
       const val = parseFloat(discountValue);
-      if (val < 0 || val > 10) {
-        showError('Discount percentage must be between 0% and 10%');
+      if (isNaN(val) || val < 0 || val > 100) {
+        showError('Discount percentage must be between 0% and 100%');
         return;
       }
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      showError('Start date must be before end date');
+      return;
     }
     setLoading(true);
     try {
@@ -119,6 +130,9 @@ export default function EditPromotionScreen({ route, navigation }) {
             autoCapitalize="characters"
             placeholderTextColor={colors.textLight}
           />
+          <TouchableOpacity style={styles.generateBtn} onPress={() => generateCode(8)}>
+            <Text style={styles.generateText}>Generate</Text>
+          </TouchableOpacity>
         </View>
 
         <ChipSelector 
@@ -187,17 +201,31 @@ export default function EditPromotionScreen({ route, navigation }) {
           <ImageIcon color={colors.primary} size={24} />
           <Text style={styles.imagePickerText}>{image ? 'Change Image' : 'Upload Image'}</Text>
         </TouchableOpacity>
-        {image && <Text style={styles.imageName}>{image.uri.split('/').pop()}</Text>}
-        {!image && promotion.bannerImage && <Text style={styles.imageName}>Existing: {promotion.bannerImage.split('/').pop()}</Text>}
+        {image ? (
+          <View style={styles.imagePreviewWrap}>
+            <Image source={{ uri: image.uri }} style={styles.imagePreview} resizeMode="cover" />
+            <Text style={styles.imageName}>{image.uri.split('/').pop()}</Text>
+          </View>
+        ) : promotion.bannerImage ? (
+          <View style={styles.imagePreviewWrap}>
+            <Image source={{ uri: promotion.bannerImage }} style={styles.imagePreview} resizeMode="cover" />
+            <Text style={styles.imageName}>Existing: {promotion.bannerImage.split('/').pop()}</Text>
+          </View>
+        ) : null}
 
-        <TouchableOpacity style={styles.btn} onPress={handleUpdate} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : (
-            <>
-              <Save color="#fff" size={20} />
-              <Text style={styles.btnText}>Save Changes</Text>
-            </>
-          )}
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+          <TouchableOpacity style={[styles.btn, styles.saveBtn]} onPress={handleUpdate} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : (
+              <>
+                <Save color="#fff" size={20} />
+                <Text style={styles.btnText}>Save Changes</Text>
+              </>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.btn, styles.cancelBtn]} onPress={() => navigation.goBack()}>
+            <Text style={[styles.btnText, { color: colors.text }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -232,6 +260,12 @@ const styles = StyleSheet.create({
   imagePicker: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: colors.backgroundSecondary, borderRadius: 12, borderWidth: 1, borderColor: colors.primary, borderStyle: 'dashed', height: 54, marginBottom: 8 },
   imagePickerText: { color: colors.primary, fontWeight: '600', fontSize: 15 },
   imageName: { fontSize: 12, color: colors.textLight, marginBottom: 16, textAlign: 'center' },
+  imagePreviewWrap: { alignItems: 'center', marginBottom: 12 },
+  imagePreview: { width: '100%', height: 140, borderRadius: 12, marginBottom: 8 },
+  generateBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: colors.surfaceDark, borderWidth: 1, borderColor: colors.border },
+  generateText: { color: colors.text, fontWeight: '700' },
   btn: { backgroundColor: colors.primary, height: 56, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 10 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  saveBtn: { flex: 1 },
+  cancelBtn: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flex: 1, justifyContent: 'center' },
 });
